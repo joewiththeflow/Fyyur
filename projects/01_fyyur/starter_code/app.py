@@ -48,7 +48,7 @@ class Venue(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
-    genres = db.relationship('Genre', secondary=venue_genres, backref=db.backref('venue', lazy=True))
+    genres = db.relationship('Genre', secondary=venue_genres, backref=db.backref('venues', lazy=True))
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     address = db.Column(db.String(120))
@@ -58,7 +58,7 @@ class Venue(db.Model):
     website = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(500))
-    shows = db.relationship('Artist', secondary=shows, backref=db.backref('venue', lazy=True))
+    artists = db.relationship('Artist', secondary=shows, backref=db.backref('venues', lazy=True))
     # past_shows - I think this is a many-to-many, should be calc by date
     # upcoming_shows - Same again
     # past_shows_count - should be calculated
@@ -71,7 +71,7 @@ class Artist(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
-    genres = db.relationship('Genre', secondary=artist_genres, backref=db.backref('artist', lazy=True))
+    genres = db.relationship('Genre', secondary=artist_genres, backref=db.backref('artists', lazy=True))
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     phone = db.Column(db.String(120))
