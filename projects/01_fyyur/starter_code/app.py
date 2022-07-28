@@ -38,6 +38,11 @@ artist_genres = db.Table('artist_genres',
   db.Column('genre_id', db.Integer, db.ForeignKey('genre.id'), primary_key=True)
 )
 
+shows = db.Table('shows',
+  db.Column('venue_id', db.Integer, db.ForeignKey('venue.id'), primary_key=True),
+  db.Column('artist_id', db.Integer, db.ForeignKey('artist.id'), primary_key=True),
+  db.Column('start_time', db.DateTime, primary_key=True))
+
 class Venue(db.Model):
     __tablename__ = 'venue'
 
@@ -50,11 +55,10 @@ class Venue(db.Model):
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
-
-    # genres - not sure about this
     website = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(500))
+    shows = db.relationship('Artist', secondary=shows, backref=db.backref('venue', lazy=True))
     # past_shows - I think this is a many-to-many, should be calc by date
     # upcoming_shows - Same again
     # past_shows_count - should be calculated
@@ -73,8 +77,6 @@ class Artist(db.Model):
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
-
-    # genres - not sure about this
     website = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(500))
