@@ -40,6 +40,15 @@ class Venue(db.Model):
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
 
+    # genres - not sure about this
+    website = db.Column(db.String(120))
+    seeking_talent = db.Column(db.Boolean)
+    seeking_description = db.Column(db.String(500))
+    # past_shows - I think this is a many-to-many, should be calc by date
+    # upcoming_shows - Same again
+    # past_shows_count - should be calculated
+    # upcoming_shows_count - should be calculated
+
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 class Artist(db.Model):
@@ -53,6 +62,15 @@ class Artist(db.Model):
     genres = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+
+    # genres - not sure about this
+    website = db.Column(db.String(120))
+    seeking_venue = db.Column(db.Boolean)
+    seeking_description = db.Column(db.String(500))
+    # past_shows - I think this is a many-to-many, should be calc by date
+    # upcoming_shows - Same again
+    # past_shows_count - should be calculated
+    # upcoming_shows_count - should be calculated
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
