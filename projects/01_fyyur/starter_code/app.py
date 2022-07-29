@@ -64,6 +64,10 @@ class Venue(db.Model):
     # past_shows_count - should be calculated
     # upcoming_shows_count - should be calculated
 
+    def __repr__(self):
+      return f'<Venue ID: {self.id}, Name: {self.name}, Genres: {self.genres}, City: {self.city}, State: {self.state}, Address: {self.address}, \
+        Phone: {self.phone}, Image Link: {self.image_link}, Facebook Link: {self.facebook_link}, Website: {self.website}, Seeking Talent?: \
+          {self.seeking_talent}, Seeking Description: {self.seeking_description}, Artists: {self.artists}>'
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 class Artist(db.Model):
@@ -85,6 +89,10 @@ class Artist(db.Model):
     # past_shows_count - should be calculated
     # upcoming_shows_count - should be calculated
 
+    def __repr__(self):
+      return f'<Artist ID: {self.id}, Name: {self.name}, Genres: {self.genres}, City: {self.city}, State: {self.state}, Phone: {self.phone}, \
+        Image Link: {self.image_link}, Facebook Link: {self.facebook_link}, Website: {self.website}, Seeking Venue?: {self.seeking_venue}, \
+          Seeking Description: {self.seeking_description}, Venues: {self.venues}>'
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
@@ -94,6 +102,9 @@ class Genre(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
+
+    def __repr__(self):
+      return f'<Genre ID: {self.id}, Name: {self.name}, Venues: {self.venues}, Artists: {self.artists}>'
 
 #----------------------------------------------------------------------------#
 # Filters.
