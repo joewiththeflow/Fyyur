@@ -453,6 +453,7 @@ def create_artist_submission():
   # called upon submitting the new artist listing form
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
+  print('Name: ' + request.form['name'], 'City: ' + request.form['city'], 'State: ' + request.form['state'], 'Phone: ' + request.form['phone'], 'Image :' + request.form['image_link'], 'Genres:' + '[' + str(request.form.getlist('genres')) + ']', 'Facebook: ' + request.form['facebook_link'], 'Website: ' + request.form['website_link'], 'Seeking Venue?: ' + request.form['seeking_venue'], 'Seeking Description: ' + request.form['seeking_description'] )
 
   # on successful db insert, flash success
   flash('Artist ' + request.form['name'] + ' was successfully listed!')
