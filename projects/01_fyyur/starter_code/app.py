@@ -65,9 +65,7 @@ class Venue(db.Model):
     # upcoming_shows_count - should be calculated
 
     def __repr__(self):
-      return f'<Venue ID: {self.id}, Name: {self.name}, Genres: {self.genres}, City: {self.city}, State: {self.state}, Address: {self.address}, \
-        Phone: {self.phone}, Image Link: {self.image_link}, Facebook Link: {self.facebook_link}, Website: {self.website}, Seeking Talent?: \
-          {self.seeking_talent}, Seeking Description: {self.seeking_description}, Artists: {self.artists}>'
+      return f'<Venue ID: {self.id}, Name: {self.name}, Genres: {self.genres}, City: {self.city}, State: {self.state}, Address: {self.address}, Phone: {self.phone}, Image Link: {self.image_link}, Facebook Link: {self.facebook_link}, Website: {self.website}, Seeking Talent?: {self.seeking_talent}, Seeking Description: {self.seeking_description}>'
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 class Artist(db.Model):
@@ -90,9 +88,7 @@ class Artist(db.Model):
     # upcoming_shows_count - should be calculated
 
     def __repr__(self):
-      return f'<Artist ID: {self.id}, Name: {self.name}, Genres: {self.genres}, City: {self.city}, State: {self.state}, Phone: {self.phone}, \
-        Image Link: {self.image_link}, Facebook Link: {self.facebook_link}, Website: {self.website}, Seeking Venue?: {self.seeking_venue}, \
-          Seeking Description: {self.seeking_description}, Venues: {self.venues}>'
+      return f'<Artist ID: {self.id}, Name: {self.name}, Genres: {self.genres}, City: {self.city}, State: {self.state}, Phone: {self.phone}, Image Link: {self.image_link}, Facebook Link: {self.facebook_link}, Website: {self.website}, Seeking Venue?: {self.seeking_venue}, Seeking Description: {self.seeking_description}>'
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
@@ -104,7 +100,7 @@ class Genre(db.Model):
     name = db.Column(db.String)
 
     def __repr__(self):
-      return f'<Genre ID: {self.id}, Name: {self.name}, Venues: {self.venues}, Artists: {self.artists}>'
+      return f'<Genre ID: {self.id}, Name: {self.name}>'
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -271,6 +267,27 @@ def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
   print('Name: ' + request.form['name'], 'City: ' + request.form['city'], 'State: ' + request.form['state'], 'Address: ' + request.form['address'], 'Phone: ' + request.form['phone'], 'Image :' + request.form['image_link'], 'Genres:' + '[' + str(request.form.getlist('genres')) + ']', 'Facebook: ' + request.form['facebook_link'], 'Website: ' + request.form['website_link'], 'Seeking Talent?: ' + request.form['seeking_talent'], 'Seeking Description: ' + request.form['seeking_description'] )
+
+  name= request.form['name']
+  city = request.form['city']
+  state = request.form['state']
+  address =request.form['address']
+  phone = request.form['phone']
+  image_link = request.form['image_link']
+  facebook_link = request.form['facebook_link']
+  website_link= request.form['website_link']
+  seeking_talent = request.form['seeking_talent']
+  seeking_description= request.form['seeking_description']
+
+  #genres = request.form.getlist('genres')
+  # I would like to loop through each genre name and add it to the Genre table if it does not already exist
+  # I think if we add a unique type constraint to the genres table, it will do this for us i.e. add only if not there
+  # genres = [Genre(name=request.form.getlist('genres')[0])]
+  genres = [Genre(name=x) for x in request.form.getlist('genres')]
+
+  venue = Venue(name=name, city=city, state=state, address=address, phone=phone, image_link=image_link, genres=genres, facebook_link=facebook_link,website=website_link, seeking_talent=seeking_talent, seeking_description=seeking_description)
+
+  print(venue)
   # on successful db insert, flash success
   flash('Venue ' + request.form['name'] + ' was successfully listed!')
   # TODO: on unsuccessful db insert, flash an error instead.
