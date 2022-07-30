@@ -3,6 +3,7 @@
 #----------------------------------------------------------------------------#
 
 import json
+import sys
 import dateutil.parser
 import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
@@ -266,33 +267,42 @@ def create_venue_form():
 def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
-  print('Name: ' + request.form['name'], 'City: ' + request.form['city'], 'State: ' + request.form['state'], 'Address: ' + request.form['address'], 'Phone: ' + request.form['phone'], 'Image :' + request.form['image_link'], 'Genres:' + '[' + str(request.form.getlist('genres')) + ']', 'Facebook: ' + request.form['facebook_link'], 'Website: ' + request.form['website_link'], 'Seeking Talent?: ' + request.form['seeking_talent'], 'Seeking Description: ' + request.form['seeking_description'] )
+  error = False
+  try:
+    # Extract all pproperties from the form
+    name= request.form['name']
+    city = request.form['city']
+    state = request.form['state']
+    address =request.form['address']
+    phone = request.form['phone']
+    image_link = request.form['image_link']
+    genres = [Genre(name=x) for x in request.form.getlist('genres')]
+    facebook_link = request.form['facebook_link']
+    website_link= request.form['website_link']
+    seeking_talent = True if request.form['seeking_talent'] == 'y' else False
+    seeking_description= request.form['seeking_description']
+    
+    # Create a Venue model
+    venue = Venue(name=name, city=city, state=state, address=address, phone=phone, image_link=image_link, genres=genres, facebook_link=facebook_link,website=website_link, seeking_talent=seeking_talent, seeking_description=seeking_description)
 
-  name= request.form['name']
-  city = request.form['city']
-  state = request.form['state']
-  address =request.form['address']
-  phone = request.form['phone']
-  image_link = request.form['image_link']
-  facebook_link = request.form['facebook_link']
-  website_link= request.form['website_link']
-  seeking_talent = request.form['seeking_talent']
-  seeking_description= request.form['seeking_description']
-
-  #genres = request.form.getlist('genres')
-  # I would like to loop through each genre name and add it to the Genre table if it does not already exist
-  # I think if we add a unique type constraint to the genres table, it will do this for us i.e. add only if not there
-  # genres = [Genre(name=request.form.getlist('genres')[0])]
-  genres = [Genre(name=x) for x in request.form.getlist('genres')]
-
-  venue = Venue(name=name, city=city, state=state, address=address, phone=phone, image_link=image_link, genres=genres, facebook_link=facebook_link,website=website_link, seeking_talent=seeking_talent, seeking_description=seeking_description)
-
-  print(venue)
-  # on successful db insert, flash success
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+    # Commit Venue to database
+    db.session.add(venue)
+    db.session.commit()
+  except:
+    error = True
+    db.session.rollback()
+    print(sys.exc_info())
+  finally:
+    db.session.close()
+  if error:
+    # TODO: on unsuccessful db insert, flash an error instead.
+    # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
+    # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+    flash('An error occurred. Venue ' + name + ' could not be listed.')
+  else:
+    # on successful db insert, flash success
+    flash('Venue ' + name + ' was successfully listed!')
+  
   return render_template('pages/home.html')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
