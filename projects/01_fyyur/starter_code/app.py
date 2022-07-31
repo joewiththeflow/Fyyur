@@ -4,6 +4,7 @@
 
 import json
 import sys
+from tracemalloc import start
 import dateutil.parser
 import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
@@ -13,6 +14,7 @@ from flask_sqlalchemy import SQLAlchemy
 import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
+from sqlalchemy import ForeignKey
 from forms import *
 #----------------------------------------------------------------------------#
 # App Config.
@@ -39,10 +41,10 @@ artist_genres = db.Table('artist_genres',
   db.Column('genre_id', db.Integer, db.ForeignKey('genre.id'), primary_key=True)
 )
 
-shows = db.Table('shows',
-  db.Column('venue_id', db.Integer, db.ForeignKey('venue.id'), primary_key=True),
-  db.Column('artist_id', db.Integer, db.ForeignKey('artist.id'), primary_key=True),
-  db.Column('start_time', db.DateTime, primary_key=True))
+# shows = db.Table('shows',
+#   db.Column('venue_id', db.Integer, db.ForeignKey('venue.id'), primary_key=True),
+#   db.Column('artist_id', db.Integer, db.ForeignKey('artist.id'), primary_key=True),
+#   db.Column('start_time', db.DateTime, primary_key=True))
 
 class Venue(db.Model):
     __tablename__ = 'venue'
@@ -59,7 +61,8 @@ class Venue(db.Model):
     website = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(500))
-    artists = db.relationship('Artist', secondary=shows, backref=db.backref('venues', lazy=True))
+    shows = db.relationship('Show', backref=db.backref('venue'))
+    # artists = db.relationship('Artist', secondary=shows, backref=db.backref('venues', lazy=True))
     # past_shows - I think this is a many-to-many, should be calc by date
     # upcoming_shows - Same again
     # past_shows_count - should be calculated
@@ -83,6 +86,7 @@ class Artist(db.Model):
     website = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(500))
+    #venues = db.relationship('Show', backref=db.backref('artist'))
     # past_shows - I think this is a many-to-many, should be calc by date
     # upcoming_shows - Same again
     # past_shows_count - should be calculated
@@ -103,6 +107,18 @@ class Genre(db.Model):
     def __repr__(self):
       return f'<Genre ID: {self.id}, Name: {self.name}>'
 
+class Show(db.Model):
+  __tablename__ = 'shows'
+  venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'), primary_key=True)
+  artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), primary_key=True)
+  start_time = db.Column(db.DateTime, primary_key=True)
+  artist = db.relationship('Artist', backref=db.backref('shows'))
+  # venue = db.relationship('Venue', backref=db.backref('artists'))
+
+  def __init__(self, venue, artist, start_time):
+    self.venue_id = venue.id
+    self.artist_id = artist.id
+    self.start_time = start_time
 #----------------------------------------------------------------------------#
 # Filters.
 #----------------------------------------------------------------------------#
@@ -601,12 +617,38 @@ def create_shows():
 def create_show_submission():
   # called to create new shows in the db, upon submitting new show listing form
   # TODO: insert form data as a new Show record in the db, instead
+  error = False
 
-  # on successful db insert, flash success
-  flash('Show was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Show could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+  try:
+    artist_id = int(request.form['artist_id'])
+    venue_id = int(request.form['venue_id'])
+    start_time = dateutil.parser.parse(request.form['start_time'])
+
+    venue = Venue.query.get(venue_id)
+    artist = Artist.query.filter_by(id=artist_id).first()
+    show = Show(venue, artist, start_time)
+    show.artist = artist
+    # #show.venue = venue
+    venue.shows.append(show)
+
+    # # Commit the amended venue to the datbase
+    db.session.add(venue)
+    db.session.commit()
+  except:
+    error = True
+    db.session.rollback()
+    print(sys.exc_info())
+  finally:
+    db.session.close()
+  if error:
+    # TODO: on unsuccessful db insert, flash an error instead.
+    # e.g., flash('An error occurred. Show could not be listed.')
+    # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+    flash('An error occurred. Show could not be listed.')
+  else:
+    # on successful db insert, flash success
+    flash('Show was successfully listed!')
+  
   return render_template('pages/home.html')
 
 @app.errorhandler(404)
