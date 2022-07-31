@@ -467,7 +467,7 @@ def edit_venue_submission(venue_id):
     db.session.close()
   if error:
     # flash('An error occurred. Venue ' + venue.name + ' could not be edited.')
-    print("error")
+    print("success")
   else:
     # on successful db insert, flash success
     # flash('Venue ' + venue.name + ' was successfully listed!')
