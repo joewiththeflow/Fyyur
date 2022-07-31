@@ -279,7 +279,7 @@ def create_venue_submission():
       genres.append(Genre(name=name))
 
   try:
-    # Extract all pproperties from the form
+    # Extract all properties from the form
     name= request.form['name']
     city = request.form['city']
     state = request.form['state']
@@ -500,12 +500,49 @@ def create_artist_submission():
   # called upon submitting the new artist listing form
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
-  print('Name: ' + request.form['name'], 'City: ' + request.form['city'], 'State: ' + request.form['state'], 'Phone: ' + request.form['phone'], 'Image :' + request.form['image_link'], 'Genres:' + '[' + str(request.form.getlist('genres')) + ']', 'Facebook: ' + request.form['facebook_link'], 'Website: ' + request.form['website_link'], 'Seeking Venue?: ' + request.form['seeking_venue'], 'Seeking Description: ' + request.form['seeking_description'] )
+  error = False
 
-  # on successful db insert, flash success
-  flash('Artist ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
+  # Check whether genre with name exists, else create a new genre
+  genres= []
+  for name in request.form.getlist('genres'):
+    genre = Genre.query.filter_by(name=name).first()
+    if genre:
+      genres.append(genre)
+    else:
+      genres.append(Genre(name=name))
+  
+  try:
+    # Extract all properties from the form
+    name= request.form['name']
+    city = request.form['city']
+    state = request.form['state']
+    phone = request.form['phone']
+    image_link = request.form['image_link']
+    facebook_link = request.form['facebook_link']
+    website_link= request.form['website_link']
+    seeking_venue = True if 'seeking_venue' in request.form else False
+    seeking_description= request.form['seeking_description']
+    
+    # Create an Artist model
+    artist = Artist(name=name, city=city, state=state, phone=phone, image_link=image_link, genres=genres, facebook_link=facebook_link,website=website_link, seeking_venue=seeking_venue, seeking_description=seeking_description)
+
+    # Commit Artist to database
+    db.session.add(artist)
+    db.session.commit()
+  except:
+    error = True
+    db.session.rollback()
+    print(sys.exc_info())
+  finally:
+    db.session.close()
+  if error:
+    # TODO: on unsuccessful db insert, flash an error instead.
+    # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
+    flash('An error occurred. Artist ' + name + ' could not be listed.')
+  else:
+    # on successful db insert, flash success
+    flash('Artist ' + name + ' was successfully listed!')
+
   return render_template('pages/home.html')
 
 
