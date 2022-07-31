@@ -269,8 +269,7 @@ def create_venue_submission():
   # TODO: modify data to be the data object returned from db insertion
   error = False
 
-  # I think we're going to have to try and get the genre records and use those objectt
-  # or we create a new genre object with an id of none to specify we want it added
+  # Check whether genre with name exists, else create a new genre
   genres= []
   for name in request.form.getlist('genres'):
     genre = Genre.query.filter_by(name=name).first()
@@ -287,7 +286,6 @@ def create_venue_submission():
     address =request.form['address']
     phone = request.form['phone']
     image_link = request.form['image_link']
-    #genres = [Genre(name=x) for x in request.form.getlist('genres')]
     facebook_link = request.form['facebook_link']
     website_link= request.form['website_link']
     seeking_talent = True if 'seeking_talent' in request.form else False
