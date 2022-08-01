@@ -14,7 +14,7 @@ from flask_sqlalchemy import SQLAlchemy
 import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, func
 from forms import *
 #----------------------------------------------------------------------------#
 # App Config.
@@ -175,14 +175,20 @@ def search_venues():
   # TODO: implement search on venues with partial string search. Ensure it is case-insensitive.
   # seach for Hop should return "The Musical Hop".
   # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
+  search_term = request.form.get('search_term', '')
+  data = []
+  for venue in Venue.query.filter(func.lower(Venue.name).contains(func.lower(search_term))):
+    data.append({
+      "id": venue.id,
+      "name": venue.name,
+      "num_upcoming_shows": len([show for show in venue.shows if show.start_time > datetime.now()]),
+    })
+  
   response={
-    "count": 1,
-    "data": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
+    "count": len(data),
+    "data": data
   }
+  
   return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
 
 @app.route('/venues/<int:venue_id>')
