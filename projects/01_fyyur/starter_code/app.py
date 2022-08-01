@@ -412,8 +412,11 @@ def show_artist(artist_id):
 #  ----------------------------------------------------------------
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
 def edit_artist(artist_id):
-  form = ArtistForm()
   artist_row = Artist.query.get(artist_id)
+  form = ArtistForm(obj=artist_row, website_link=artist_row.website)
+
+  # override the genres in the form
+  form.genres.data = [x.name for x in artist_row.genres]
   artist={
     "id": artist_row.id,
     "name": artist_row.name,
