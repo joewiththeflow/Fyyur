@@ -37,8 +37,8 @@ venue_genres = db.Table('venue_genres',
 )
 
 artist_genres = db.Table('artist_genres',
-  db.Column('artist_id', db.Integer, db.ForeignKey('artist.id'), primary_key=True),
-  db.Column('genre_id', db.Integer, db.ForeignKey('genre.id'), primary_key=True)
+  db.Column('artist_id', db.Integer, db.ForeignKey('artist.id', ondelete='CASCADE'), primary_key=True),
+  db.Column('genre_id', db.Integer, db.ForeignKey('genre.id', ondelete='CASCADE'), primary_key=True)
 )
 
 # shows = db.Table('shows',
@@ -77,7 +77,7 @@ class Artist(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
-    genres = db.relationship('Genre', secondary=artist_genres, backref=db.backref('artists', lazy=True))
+    genres = db.relationship('Genre', secondary=artist_genres, cascade='all,delete', backref=db.backref('artists', lazy=True))
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     phone = db.Column(db.String(120))
@@ -112,7 +112,7 @@ class Show(db.Model):
   venue_id = db.Column(db.Integer, db.ForeignKey('venue.id', ondelete='CASCADE'), primary_key=True)
   artist_id = db.Column(db.Integer, db.ForeignKey('artist.id', ondelete='CASCADE'), primary_key=True)
   start_time = db.Column(db.DateTime, primary_key=True)
-  artist = db.relationship('Artist', backref=db.backref('shows'))
+  artist = db.relationship('Artist', backref=db.backref('shows', cascade='all,delete'))
   # venue = db.relationship('Venue', backref=db.backref('artists'))
 
   def __init__(self, venue, artist, start_time):
