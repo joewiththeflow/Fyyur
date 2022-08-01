@@ -478,8 +478,11 @@ def edit_artist_submission(artist_id):
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
-  form = VenueForm()
   venue_row = Venue.query.get(venue_id)
+  form = VenueForm(obj=venue_row, website_link=venue_row.website)
+
+  # override the genres in the form
+  form.genres.data = [x.name for x in venue_row.genres]
   venue={
     "id": venue_row.id,
     "name": venue_row.name,
