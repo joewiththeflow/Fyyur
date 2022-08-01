@@ -1,4 +1,3 @@
-from email.policy import default
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -30,7 +29,7 @@ class Venue(db.Model):
     image_link = db.Column(db.String(500), nullable=True, unique=True)
     facebook_link = db.Column(db.String(120), nullable=True, unique=True)
     website = db.Column(db.String(120), nullable=True, unique=True)
-    seeking_talent = db.Column(db.Boolean, nullable=False, default=True)
+    seeking_talent = db.Column(db.Boolean, nullable=False, default=True, server_default="true")
     seeking_description = db.Column(db.String(500), nullable=True)
     shows = db.relationship('Show', cascade='all,delete', backref=db.backref('venue'))
 
@@ -52,7 +51,7 @@ class Artist(db.Model):
     image_link = db.Column(db.String(500), nullable=True, unique=True)
     facebook_link = db.Column(db.String(120), nullable=True, unique=True)
     website = db.Column(db.String(120), nullable=True, unique=True)
-    seeking_venue = db.Column(db.Boolean, nullable=False, default=True)
+    seeking_venue = db.Column(db.Boolean, nullable=False, default=True, server_default="true")
     seeking_description = db.Column(db.String(500), nullable=True)
 
     def __repr__(self):
