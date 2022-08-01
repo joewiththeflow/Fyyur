@@ -118,5 +118,29 @@
   <script type="text/javascript" src="/static/js/libs/bootstrap-3.1.1.min.js" defer></script>
   <script type="text/javascript" src="/static/js/plugins.js" defer></script>
 
+  <script>
+    const deleteButtons = document.getElementsByClassName('delete-venue')
+	for (let i = 0; i < deleteButtons.length; i++) {
+        const btn = deleteButtons[i];
+				btn.onclick = function(e) {
+          console.log('event', e);
+					const venueId = e.target.dataset['id'];
+          fetch('/venues/' + venueId, {
+            method: 'DELETE',
+          })
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(jsonResponse) {
+            console.log("Success", jsonResponse);
+            window.location.href = '/';
+          })
+          .catch(function(e) {
+            console.log("Success", response);
+          });
+        }
+      }
+  </script>
+
 </body>
 </html>

@@ -304,10 +304,28 @@ def create_venue_submission():
 def delete_venue(venue_id):
   # TODO: Complete this endpoint for taking a venue_id, and using
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
+  error = False
+
+  try:
+    Venue.query.filter_by(id=venue_id).delete()
+    db.session.commit()
+  except:
+    error = True
+    db.session.rollback()
+    print(sys.exc_info())
+  finally:
+    db.session.close()
+  if error:
+    # flash('An error occurred. Venue could not be deleted.')
+    print("error")
+  else:
+    # on successful db insert, flash success
+    # flash('Venue was successfully deleted!')
+    print("success")
 
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
   # clicking that button delete it from the db then redirect the user to the homepage
-  return None
+  return jsonify({'success': not(error)})
 
 #  Artists
 #  ----------------------------------------------------------------
@@ -450,11 +468,11 @@ def edit_artist_submission(artist_id):
     db.session.close()
   if error:
     # flash('An error occurred. Artist ' + artist.name + ' could not be edited.')
-    print("success")
+    print("error")
   else:
     # on successful db insert, flash success
     # flash('Artist ' + artist.name + ' was successfully listed!')
-    print("error")
+    print("success")
 
   return redirect(url_for('show_artist', artist_id=artist_id))
 
