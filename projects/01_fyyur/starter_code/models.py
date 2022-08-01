@@ -1,3 +1,4 @@
+from email.policy import default
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -20,17 +21,17 @@ class Venue(db.Model):
     __tablename__ = 'venue'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
+    name = db.Column(db.String(120), nullable=False, unique=True)
     genres = db.relationship('Genre', secondary=venue_genres, cascade='all,delete', backref=db.backref('venues', lazy=True))
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
-    address = db.Column(db.String(120))
-    phone = db.Column(db.String(120))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
-    website = db.Column(db.String(120))
-    seeking_talent = db.Column(db.Boolean)
-    seeking_description = db.Column(db.String(500))
+    city = db.Column(db.String(80), nullable=False)
+    state = db.Column(db.String(2), nullable=False)
+    address = db.Column(db.String(120), nullable=False, unique=True)
+    phone = db.Column(db.String(15), nullable=True, unique=True)
+    image_link = db.Column(db.String(500), nullable=True, unique=True)
+    facebook_link = db.Column(db.String(120), nullable=True, unique=True)
+    website = db.Column(db.String(120), nullable=True, unique=True)
+    seeking_talent = db.Column(db.Boolean, nullable=False, default=True)
+    seeking_description = db.Column(db.String(500), nullable=True)
     shows = db.relationship('Show', cascade='all,delete', backref=db.backref('venue'))
 
     def __repr__(self):
@@ -43,16 +44,16 @@ class Artist(db.Model):
     __tablename__ = 'artist'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
+    name = db.Column(db.String(120), nullable=False, unique=True)
     genres = db.relationship('Genre', secondary=artist_genres, cascade='all,delete', backref=db.backref('artists', lazy=True))
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
-    phone = db.Column(db.String(120))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
-    website = db.Column(db.String(120))
-    seeking_venue = db.Column(db.Boolean)
-    seeking_description = db.Column(db.String(500))
+    city = db.Column(db.String(80), nullable=False)
+    state = db.Column(db.String(2), nullable=False)
+    phone = db.Column(db.String(15), nullable=True, unique=True)
+    image_link = db.Column(db.String(500), nullable=True, unique=True)
+    facebook_link = db.Column(db.String(120), nullable=True, unique=True)
+    website = db.Column(db.String(120), nullable=True, unique=True)
+    seeking_venue = db.Column(db.Boolean, nullable=False, default=True)
+    seeking_description = db.Column(db.String(500), nullable=True)
 
     def __repr__(self):
       return f'<Artist ID: {self.id}, Name: {self.name}, Genres: {self.genres}, City: {self.city}, State: {self.state}, Phone: {self.phone}, Image Link: {self.image_link}, Facebook Link: {self.facebook_link}, Website: {self.website}, Seeking Venue?: {self.seeking_venue}, Seeking Description: {self.seeking_description}>'
