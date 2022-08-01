@@ -10,7 +10,8 @@ import babel
 from flask import Flask, jsonify, render_template, request, Response, flash, redirect, url_for
 from flask_migrate import Migrate
 from flask_moment import Moment
-from flask_sqlalchemy import SQLAlchemy
+# from flask_sqlalchemy import SQLAlchemy
+from models import db, venue_genres, artist_genres, Venue, Artist, Genre, Show
 import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
@@ -23,102 +24,12 @@ from forms import *
 app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
-db = SQLAlchemy(app)
+# db = SQLAlchemy(app)
+db.init_app(app)
 
 # TODO: connect to a local postgresql database
 migrate = Migrate(app, db)
-#----------------------------------------------------------------------------#
-# Models.
-#----------------------------------------------------------------------------#
 
-venue_genres = db.Table('venue_genres',
-  db.Column('venue_id', db.Integer, db.ForeignKey('venue.id', ondelete='CASCADE'), primary_key=True),
-  db.Column('genre_id', db.Integer, db.ForeignKey('genre.id', ondelete='CASCADE'),primary_key=True)
-)
-
-artist_genres = db.Table('artist_genres',
-  db.Column('artist_id', db.Integer, db.ForeignKey('artist.id', ondelete='CASCADE'), primary_key=True),
-  db.Column('genre_id', db.Integer, db.ForeignKey('genre.id', ondelete='CASCADE'), primary_key=True)
-)
-
-# shows = db.Table('shows',
-#   db.Column('venue_id', db.Integer, db.ForeignKey('venue.id'), primary_key=True),
-#   db.Column('artist_id', db.Integer, db.ForeignKey('artist.id'), primary_key=True),
-#   db.Column('start_time', db.DateTime, primary_key=True))
-
-class Venue(db.Model):
-    __tablename__ = 'venue'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    genres = db.relationship('Genre', secondary=venue_genres, cascade='all,delete', backref=db.backref('venues', lazy=True))
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
-    address = db.Column(db.String(120))
-    phone = db.Column(db.String(120))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
-    website = db.Column(db.String(120))
-    seeking_talent = db.Column(db.Boolean)
-    seeking_description = db.Column(db.String(500))
-    shows = db.relationship('Show', cascade='all,delete', backref=db.backref('venue'))
-    # artists = db.relationship('Artist', secondary=shows, backref=db.backref('venues', lazy=True))
-    # past_shows - I think this is a many-to-many, should be calc by date
-    # upcoming_shows - Same again
-    # past_shows_count - should be calculated
-    # upcoming_shows_count - should be calculated
-
-    def __repr__(self):
-      return f'<Venue ID: {self.id}, Name: {self.name}, Genres: {self.genres}, City: {self.city}, State: {self.state}, Address: {self.address}, Phone: {self.phone}, Image Link: {self.image_link}, Facebook Link: {self.facebook_link}, Website: {self.website}, Seeking Talent?: {self.seeking_talent}, Seeking Description: {self.seeking_description}>'
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
-class Artist(db.Model):
-    __tablename__ = 'artist'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    genres = db.relationship('Genre', secondary=artist_genres, cascade='all,delete', backref=db.backref('artists', lazy=True))
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
-    phone = db.Column(db.String(120))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
-    website = db.Column(db.String(120))
-    seeking_venue = db.Column(db.Boolean)
-    seeking_description = db.Column(db.String(500))
-    #venues = db.relationship('Show', backref=db.backref('artist'))
-    # past_shows - I think this is a many-to-many, should be calc by date
-    # upcoming_shows - Same again
-    # past_shows_count - should be calculated
-    # upcoming_shows_count - should be calculated
-
-    def __repr__(self):
-      return f'<Artist ID: {self.id}, Name: {self.name}, Genres: {self.genres}, City: {self.city}, State: {self.state}, Phone: {self.phone}, Image Link: {self.image_link}, Facebook Link: {self.facebook_link}, Website: {self.website}, Seeking Venue?: {self.seeking_venue}, Seeking Description: {self.seeking_description}>'
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
-
-class Genre(db.Model):
-    __tablename__ = 'genre'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=True)
-
-    def __repr__(self):
-      return f'<Genre ID: {self.id}, Name: {self.name}>'
-
-class Show(db.Model):
-  __tablename__ = 'shows'
-  venue_id = db.Column(db.Integer, db.ForeignKey('venue.id', ondelete='CASCADE'), primary_key=True)
-  artist_id = db.Column(db.Integer, db.ForeignKey('artist.id', ondelete='CASCADE'), primary_key=True)
-  start_time = db.Column(db.DateTime, primary_key=True)
-  artist = db.relationship('Artist', backref=db.backref('shows', cascade='all,delete'))
-  # venue = db.relationship('Venue', backref=db.backref('artists'))
-
-  def __init__(self, venue, artist, start_time):
-    self.venue_id = venue.id
-    self.artist_id = artist.id
-    self.start_time = start_time
 #----------------------------------------------------------------------------#
 # Filters.
 #----------------------------------------------------------------------------#
