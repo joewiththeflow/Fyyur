@@ -32,8 +32,8 @@ migrate = Migrate(app, db)
 #----------------------------------------------------------------------------#
 
 venue_genres = db.Table('venue_genres',
-  db.Column('venue_id', db.Integer, db.ForeignKey('venue.id'), primary_key=True),
-  db.Column('genre_id', db.Integer, db.ForeignKey('genre.id'), primary_key=True)
+  db.Column('venue_id', db.Integer, db.ForeignKey('venue.id', ondelete='CASCADE'), primary_key=True),
+  db.Column('genre_id', db.Integer, db.ForeignKey('genre.id', ondelete='CASCADE'),primary_key=True)
 )
 
 artist_genres = db.Table('artist_genres',
@@ -51,7 +51,7 @@ class Venue(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
-    genres = db.relationship('Genre', secondary=venue_genres, backref=db.backref('venues', lazy=True))
+    genres = db.relationship('Genre', secondary=venue_genres, cascade='all,delete', backref=db.backref('venues', lazy=True))
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     address = db.Column(db.String(120))
@@ -61,7 +61,7 @@ class Venue(db.Model):
     website = db.Column(db.String(120))
     seeking_talent = db.Column(db.Boolean)
     seeking_description = db.Column(db.String(500))
-    shows = db.relationship('Show', backref=db.backref('venue'))
+    shows = db.relationship('Show', cascade='all,delete', backref=db.backref('venue'))
     # artists = db.relationship('Artist', secondary=shows, backref=db.backref('venues', lazy=True))
     # past_shows - I think this is a many-to-many, should be calc by date
     # upcoming_shows - Same again
@@ -109,8 +109,8 @@ class Genre(db.Model):
 
 class Show(db.Model):
   __tablename__ = 'shows'
-  venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'), primary_key=True)
-  artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'), primary_key=True)
+  venue_id = db.Column(db.Integer, db.ForeignKey('venue.id', ondelete='CASCADE'), primary_key=True)
+  artist_id = db.Column(db.Integer, db.ForeignKey('artist.id', ondelete='CASCADE'), primary_key=True)
   start_time = db.Column(db.DateTime, primary_key=True)
   artist = db.relationship('Artist', backref=db.backref('shows'))
   # venue = db.relationship('Venue', backref=db.backref('artists'))
