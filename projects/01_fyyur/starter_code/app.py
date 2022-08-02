@@ -191,12 +191,12 @@ def create_venue_submission():
     city = request.form['city']
     state = request.form['state']
     address =request.form['address']
-    phone = request.form['phone']
-    image_link = request.form['image_link']
-    facebook_link = request.form['facebook_link']
-    website_link= request.form['website_link']
-    seeking_talent = True if 'seeking_talent' in request.form else False
-    seeking_description= request.form['seeking_description']
+    phone = request.form['phone'] if request.form['phone'] else None
+    image_link = request.form['image_link'] if request.form['image_link'] else None
+    facebook_link = request.form['facebook_link'] if request.form['facebook_link'] else None
+    website_link= request.form['website_link'] if request.form['website_link'] else None
+    seeking_talent = True if 'seeking_talent' in request.form else None
+    seeking_description= request.form['seeking_description'] if request.form['seeking_description'] else None
     
     # Create a Venue model
     venue = Venue(name=name, city=city, state=state, address=address, phone=phone, image_link=image_link, genres=genres, facebook_link=facebook_link,website=website_link, seeking_talent=seeking_talent, seeking_description=seeking_description)
@@ -529,12 +529,12 @@ def create_artist_submission():
     name= request.form['name']
     city = request.form['city']
     state = request.form['state']
-    phone = request.form['phone']
-    image_link = request.form['image_link']
-    facebook_link = request.form['facebook_link']
-    website_link= request.form['website_link']
-    seeking_venue = True if 'seeking_venue' in request.form else False
-    seeking_description= request.form['seeking_description']
+    phone = request.form['phone'] if request.form['phone'] else None
+    image_link = request.form['image_link'] if request.form['image_link'] else None
+    facebook_link = request.form['facebook_link'] if request.form['facebook_link'] else None
+    website_link= request.form['website_link'] if request.form['website_link'] else None
+    seeking_venue = True if 'seeking_venue' in request.form else None
+    seeking_description= request.form['seeking_description'] if request.form['seeking_description'] else None
     
     # Create an Artist model
     artist = Artist(name=name, city=city, state=state, phone=phone, image_link=image_link, genres=genres, facebook_link=facebook_link,website=website_link, seeking_venue=seeking_venue, seeking_description=seeking_description)
